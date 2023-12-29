@@ -1,0 +1,5 @@
+project_name = "lakme"
+project_env = "prod"
+#hosted_zone_id = "Z03722862WXQ52V315TD"
+#hosted_zone_name = "bency.site"
+#hostname = "lakme"
