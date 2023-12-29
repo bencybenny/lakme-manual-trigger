@@ -8,6 +8,8 @@ on:
         type: string
         description: "instance_ami"
         required: true
+        default: "ami-0a0f1259dd1c90938"
+
       instance_type:
 
         type: choice
@@ -15,6 +17,7 @@ on:
         options:
           - t2.micro
           - t2.small
+        default: "t2.micro"
 
 
 jobs:
