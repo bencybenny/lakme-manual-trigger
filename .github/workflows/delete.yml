@@ -1,0 +1,53 @@
+name: "destroy-infra-lakme-prod"
+on:
+  workflow_dispatch:
+    inputs:
+       instance_type:
+         type: choice
+         description: "instance type"
+         options: 
+         - t2.micro
+         - t2.small
+         default: "t2.micro"
+
+       instance_ami:
+        type: string
+        description: 'instance ami'
+        required: true
+        default: "ami-0a0f1259dd1c90938"
+    
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: "checkout repo"
+        uses: actions/checkout@v3
+
+      - name: "terraform installation"
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.2
+
+      - name: "terraform init"
+        run: |
+          terraform init \
+             -backend-config="bucket=${{ secrets.prod_bucket }}" \
+             -backend-config="key=terraform.tfstate" \
+             -backend-config="region=${{ secrets.prod_region }}" \
+             -backend-config="access_key=${{ secrets.prod_accesskey }}" \
+             -backend-config="secret_key=${{ secrets.prod_secretkey }}" \
+
+      
+      - name: Terraform destroy
+        run: |
+           terraform destroy \
+            -var "instance_type=${{ github.event.inputs.instance_type }}" \
+            -var "instance_ami=${{ github.event.inputs.instance_ami }}" \
+            -auto-approve
+
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.prod_accesskey }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.prod_secretkey }}
+          AWS_DEFAULT_REGION: ${{ secrets.prod_region }}
